@@ -479,6 +479,27 @@ qboolean Add_Ammo (edict_t *ent, gitem_t *item, int count)
 
 	return true;
 }
+//qboolean Add_Weapon(edict_t* ent, gitem_t* item, int count)
+//{
+//	int			index;
+//	int			max;
+//	if (item->tag == MAX_WEAPONS)
+//		max = ent->client->pers.max_weapon;
+//	else
+//		return false;
+//
+//	index = ITEM_INDEX(item);
+//
+//	if (ent->client->pers.inventory[index] == max)
+//		return false;
+//
+//	ent->client->pers.inventory[index] += count;
+//
+//	if (ent->client->pers.inventory[index] > max)
+//		ent->client->pers.inventory[index] = max;
+//
+//	return true;	
+//}
 
 qboolean Pickup_Ammo (edict_t *ent, edict_t *other)
 {

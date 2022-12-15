@@ -1,0 +1,12 @@
+﻿C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(520,5): warning MSB8004: Output Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Output Directory.
+  g_weapon.c
+C:\Users\mosta\Git\quake2-full\game\g_local.h(113,2): warning C4091: 'typedef ': ignored on left of '<unnamed-enum-MAX_WEAPONS>' when no variable is declared
+C:\Users\mosta\Git\quake2-full\game\g_weapon.c(311,23): warning C4133: 'function': incompatible types - from 'edict_t *' to 'vec_t *'
+C:\Users\mosta\Git\quake2-full\game\g_weapon.c(311,30): warning C4133: 'function': incompatible types - from 'cplane_t *' to 'vec_t *'
+C:\Users\mosta\Git\quake2-full\game\g_weapon.c(308,81): warning C4100: 'surf': unreferenced formal parameter
+C:\Users\mosta\Git\quake2-full\game\g_weapon.c(349,105): warning C4100: 'hyper': unreferenced formal parameter
+C:\Users\mosta\Git\quake2-full\game\g_weapon.c(349,88): warning C4100: 'effect': unreferenced formal parameter
+C:\Users\mosta\Git\quake2-full\game\g_weapon.c(349,77): warning C4100: 'speed': unreferenced formal parameter
+C:\Users\mosta\Git\quake2-full\game\g_weapon.c(460,68): warning C4100: 'plane': unreferenced formal parameter
+     Creating library .\..\release\gamex86.lib and object .\..\release\gamex86.exp
+  game.vcxproj -> C:\Program Files (x86)\Steam\steamapps\common\Quake 2\DaMod2\gamex86.dll

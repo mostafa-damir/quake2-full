@@ -277,6 +277,7 @@ pistols, rifles, etc....
 void fire_bullet (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int kick, int hspread, int vspread, int mod)
 {
 	fire_lead (self, start, aimdir, damage, kick, TE_GUNSHOT, hspread, vspread, mod);
+	/*fire_blaster (self, start, aimdir, damage, 1000, 4, true);*/
 }
 
 
@@ -289,10 +290,11 @@ Shoots shotgun pellets.  Used by shotgun and super shotgun.
 */
 void fire_shotgun (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int kick, int hspread, int vspread, int count, int mod)
 {
+	fire_lead(self, start, aimdir, damage, kick, TE_GUNSHOT, hspread, vspread, mod);
 	int		i;
 
 	for (i = 0; i < count; i++)
-		fire_lead (self, start, aimdir, damage, kick, TE_SHOTGUN, hspread, vspread, mod);
+		fire_lead (self, start, aimdir, damage, kick, TE_GUNSHOT, hspread, vspread, mod);
 }
 
 
@@ -305,7 +307,9 @@ Fires a single blaster bolt.  Used by the blaster and hyper blaster.
 */
 void blaster_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf)
 {
-	int		mod;
+	/*fire_lead(self, start, aimdir, damage, kick, TE_GUNSHOT, hspread, vspread, mod);*/
+	fire_lead(self, other, plane, 10, 5, TE_GUNSHOT, 1, 1, 1);
+	/*int		mod;
 
 	if (other == self->owner)
 		return;
@@ -339,24 +343,25 @@ void blaster_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t *
 		gi.multicast (self->s.origin, MULTICAST_PVS);
 	}
 
-	G_FreeEdict (self);
+	G_FreeEdict (self);*/
 }
 
 void fire_blaster (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, int effect, qboolean hyper)
 {
-	edict_t	*bolt;
-	trace_t	tr;
+	fire_lead(self, start, dir, damage, 4, TE_GUNSHOT, 1, 1, 1);
+	//edict_t	*bolt;
+	//trace_t	tr;
 
-	VectorNormalize (dir);
+	//VectorNormalize (dir);
 
-	bolt = G_Spawn();
-	bolt->svflags = SVF_DEADMONSTER;
+	//bolt = G_Spawn();
+	//bolt->svflags = SVF_DEADMONSTER;
 	// yes, I know it looks weird that projectiles are deadmonsters
 	// what this means is that when prediction is used against the object
 	// (blaster/hyperblaster shots), the player won't be solid clipped against
 	// the object.  Right now trying to run into a firing hyperblaster
 	// is very jerky since you are predicted 'against' the shots.
-	VectorCopy (start, bolt->s.origin);
+	/*VectorCopy (start, bolt->s.origin);
 	VectorCopy (start, bolt->s.old_origin);
 	vectoangles (dir, bolt->s.angles);
 	VectorScale (dir, speed, bolt->velocity);
@@ -386,7 +391,7 @@ void fire_blaster (edict_t *self, vec3_t start, vec3_t dir, int damage, int spee
 	{
 		VectorMA (bolt->s.origin, -10, dir, bolt->s.origin);
 		bolt->touch (bolt, tr.ent, NULL, NULL);
-	}
+	}*/
 }	
 
 
@@ -657,6 +662,8 @@ fire_rail
 */
 void fire_rail (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int kick)
 {
+	fire_lead(self, start, aimdir, damage, 4, TE_GUNSHOT, 1, 1, 1);
+
 	vec3_t		from;
 	vec3_t		end;
 	trace_t		tr;

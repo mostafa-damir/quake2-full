@@ -141,7 +141,40 @@ void ValidateSelectedItem (edict_t *ent)
 
 
 //=================================================================================
+/*
+==================
+Cmd_beginwave_f
 
+Starts enemy waves
+argv(0) beginwave
+==================
+*/
+void Cmd_beginwave_f(edict_t *ent)
+{
+	/*edict_t* ent;*/
+	//static char* name = "monster_soldier_light";
+	//edict_t* other;
+	//edict_t* activator;
+	//edict_t* self;
+
+	//ent = G_Spawn();
+	//ent->classname = name;
+	//VectorCopy(self->s.origin, ent->s.origin);
+	//VectorCopy(self->s.angles, ent->s.angles);
+	///*VectorSet(self->s.origin, 5, 25, 30);*/
+	//ED_CallSpawn(ent);
+	//gi.unlinkentity(ent);
+	//KillBox(ent);
+	//gi.linkentity(ent);
+	//if (self->speed)
+	//	VectorCopy(self->movedir, ent->velocity);
+	/*VectorSet(v, x, y, z)	(v[0] = (x), v[1] = (y), v[2] = (z)*/
+
+
+}
+
+
+//=================================================================================
 /*
 ==================
 Cmd_Give_f
@@ -158,13 +191,45 @@ void Cmd_Give_f (edict_t *ent)
 	qboolean	give_all;
 	edict_t		*it_ent;
 
-	if (deathmatch->value && !sv_cheats->value)
+	//if (deathmatch->value && !sv_cheats->value)
+	//{
+	//	gi.cprintf (ent, PRINT_HIGH, "You must run the server with '+set cheats 1' to enable this command.\n");
+	//	return;
+	//}
+
+	name = gi.args();
+	if (Q_stricmp(name, "Inf_ammo") == 0)
 	{
-		gi.cprintf (ent, PRINT_HIGH, "You must run the server with '+set cheats 1' to enable this command.\n");
+		ent->client->Inf_ammo = true;
+		ent->client->inf_ammo_timer = level.time + 10.00;
+		return;
+	}
+	if (Q_stricmp(name, "invulnerable") == 0)
+	{
+		ent->client->invulnerable = true;
+		ent->client->invulnerable_timer = level.time + 10.00;
+		return;
+	}
+	if (Q_stricmp(name, "health_up") == 0)
+	{
+		ent->client->health_up = true;
+		ent->client->health_up_timer = level.time + 1.00;
 		return;
 	}
 
-	name = gi.args();
+	if (Q_stricmp(name, "uber_health") == 0)
+	{
+		ent->client->uber_health = true;
+		ent->client->health_timer = level.time + 1.00;
+		return;
+	}
+	if (Q_stricmp(name, "uber_damage") == 0)
+	{
+		gi.dprintf("Double Damage!!!!!");
+		ent->client->uber_damage = true;
+		/*ent->client->one_shot_timer = level.time + 15.00;*/
+		return;
+	}
 
 	if (Q_stricmp(name, "all") == 0)
 		give_all = true;
@@ -323,7 +388,30 @@ void Cmd_God_f (edict_t *ent)
 
 	gi.cprintf (ent, PRINT_HIGH, msg);
 }
+/*
+==================
+Cmd_HelpMenu_f
 
+Sets client to help menu
+
+argv(0) helptxt
+==================
+*/
+void Cmd_HelpMenu_f (edict_t *ent)
+{
+	char *msg;
+
+
+	ent->flags ^= FL_HELPMENU;
+	if (!(ent->flags & FL_HELPMENU))
+	{ 
+		msg = "Have fun\n";
+	}
+	else 
+		msg = "Get ready go get guns.\nType cmd 'beginwave' to fight hordes.\nThe timer will see how long you survive.\n";
+	/*gi.dprintf(msg);*/
+	gi.centerprintf(ent, msg);
+}
 
 /*
 ==================
@@ -937,6 +1025,16 @@ void ClientCommand (edict_t *ent)
 	if (Q_stricmp (cmd, "help") == 0)
 	{
 		Cmd_Help_f (ent);
+		return;
+	}
+	if (Q_stricmp(cmd, "helptxt") == 0)
+	{
+		Cmd_HelpMenu_f(ent);
+		return;
+	}
+	if (Q_stricmp(cmd, "beginwave") == 0)
+	{
+		Cmd_beginwave_f(ent);
 		return;
 	}
 

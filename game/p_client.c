@@ -625,6 +625,7 @@ void InitClientPersistant (gclient_t *client)
 	client->pers.max_grenades	= 50;
 	client->pers.max_cells		= 200;
 	client->pers.max_slugs		= 50;
+	client->pers.max_weapon		= 3;
 
 	client->pers.connected = true;
 }
@@ -1279,6 +1280,7 @@ void ClientBeginDeathmatch (edict_t *ent)
 	gi.multicast (ent->s.origin, MULTICAST_PVS);
 
 	gi.bprintf (PRINT_HIGH, "%s entered the game\n", ent->client->pers.netname);
+	gi.centerprintf(ent, "Get ready go get guns.\nType cmd 'beginwave' to fight hordes.\nThe timer will see how long you survive.\nIf you miss this type 'helptxt'\n");
 
 	// make sure all view stuff is valid
 	ClientEndServerFrame (ent);
@@ -1346,7 +1348,19 @@ void ClientBegin (edict_t *ent)
 	}
 
 	// make sure all view stuff is valid
-	ClientEndServerFrame (ent);
+	ClientEndServerFrame(ent);
+
+	gclient_t* client;
+	client = ent->client;
+	client->Inf_ammo = false;
+	client->inf_ammo_timer = 0;
+	client->invulnerable = false;
+	client->invulnerable_timer = 0;
+	client->health_up = false;
+	client->uber_health = false;
+	client->uber_damage = false;
+	/*client->one_shot_timer = 0;*/
+
 }
 
 /*
@@ -1741,6 +1755,23 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 		if (other->inuse && other->client->chase_target == ent)
 			UpdateChaseCam(other);
 	}
+
+	gi.cprintf(ent, PRINT_HIGH, "\n\n%.1f\n\n", level.time);
+
+	if (client->uber_health == true && client->health_timer >= level.time)
+	{
+		ent->health = 250;
+	}
+	if (client->invulnerable == true && client->invulnerable_timer >= level.time)
+	{
+		ent->health = 100;
+	}
+	if (client->health_up == true )
+	{
+		ent->max_health = 150;
+	}
+
+
 }
 
 

@@ -466,6 +466,11 @@ void G_SetStats (edict_t *ent)
 		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_rebreather");
 		ent->client->ps.stats[STAT_TIMER] = (ent->client->breather_framenum - level.framenum)/10;
 	}
+	/*else if (ent->client->invulnerable_framenum > level.framenum)
+	{
+		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex("p_quad");
+		ent->client->ps.stats[STAT_TIMER] = (ent->client)
+	}*/
 	else
 	{
 		ent->client->ps.stats[STAT_TIMER_ICON] = 0;
@@ -507,7 +512,7 @@ void G_SetStats (edict_t *ent)
 	// frags
 	//
 	ent->client->ps.stats[STAT_FRAGS] = ent->client->resp.score;
-
+	
 	//
 	// help icon / current weapon if not shown
 	//

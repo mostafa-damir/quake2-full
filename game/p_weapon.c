@@ -119,15 +119,15 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
 {
 	int			index;
 	gitem_t		*ammo;
-
+	
 	index = ITEM_INDEX(ent->item);
-
+	
 	if ( ( ((int)(dmflags->value) & DF_WEAPONS_STAY) || coop->value) 
 		&& other->client->pers.inventory[index])
 	{
 		if (!(ent->spawnflags & (DROPPED_ITEM | DROPPED_PLAYER_ITEM) ) )
 			return false;	// leave the weapon for others to pickup
-	}
+}
 
 	other->client->pers.inventory[index]++;
 
@@ -317,7 +317,7 @@ void Use_Weapon (edict_t *ent, gitem_t *item)
 	if (item == ent->client->pers.weapon)
 		return;
 
-	if (item->ammo && !g_select_empty->value && !(item->flags & IT_AMMO))
+	if (item->ammo && !g_select_empty->value && !(item->flags & IT_AMMO)) 
 	{
 		ammo_item = FindItem(item->ammo);
 		ammo_index = ITEM_INDEX(ammo_item);
@@ -714,6 +714,12 @@ void weapon_grenadelauncher_fire (edict_t *ent)
 	int		damage = 120;
 	float	radius;
 
+
+	if (ent->client->uber_damage == true)
+	{
+		damage = damage * 2;
+	}
+
 	radius = damage+40;
 	if (is_quad)
 		damage *= 4;
@@ -736,7 +742,11 @@ void weapon_grenadelauncher_fire (edict_t *ent)
 
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
-	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
+	if (ent->client->Inf_ammo == true && ent->client->inf_ammo_timer >= level.time)
+	{
+		ent->client->pers.inventory[ent->client->ammo_index];
+	}
+	else if (!((int)dmflags->value & DF_INFINITE_AMMO))
 		ent->client->pers.inventory[ent->client->ammo_index]--;
 }
 
@@ -765,6 +775,13 @@ void Weapon_RocketLauncher_Fire (edict_t *ent)
 	int		radius_damage;
 
 	damage = 100 + (int)(random() * 20.0);
+
+
+	if (ent->client->uber_damage == true)
+	{
+		damage = damage * 2;
+	}
+
 	radius_damage = 120;
 	damage_radius = 120;
 	if (is_quad)
@@ -792,7 +809,11 @@ void Weapon_RocketLauncher_Fire (edict_t *ent)
 
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
-	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
+	if (ent->client->Inf_ammo == true && ent->client->inf_ammo_timer >= level.time)
+	{
+		ent->client->pers.inventory[ent->client->ammo_index];
+	}
+	else if (!((int)dmflags->value & DF_INFINITE_AMMO))
 		ent->client->pers.inventory[ent->client->ammo_index]--;
 }
 
@@ -849,9 +870,9 @@ void Weapon_Blaster_Fire (edict_t *ent)
 	int		damage;
 
 	if (deathmatch->value)
-		damage = 15;
+		damage = 0;
 	else
-		damage = 10;
+		damage = 0;
 	Blaster_Fire (ent, vec3_origin, damage, false, EF_BLASTER);
 	ent->client->ps.gunframe++;
 }
@@ -905,7 +926,17 @@ void Weapon_HyperBlaster_Fire (edict_t *ent)
 			else
 				damage = 20;
 			Blaster_Fire (ent, offset, damage, true, effect);
-			if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
+
+			if (ent->client->uber_damage == true)
+			{
+				damage = damage * 2;
+			}
+
+			if (ent->client->Inf_ammo == true && ent->client->inf_ammo_timer >= level.time)
+			{
+				ent->client->pers.inventory[ent->client->ammo_index];
+			}
+			else if (!((int)dmflags->value & DF_INFINITE_AMMO))
 				ent->client->pers.inventory[ent->client->ammo_index]--;
 
 			ent->client->anim_priority = ANIM_ATTACK;
@@ -959,6 +990,11 @@ void Machinegun_Fire (edict_t *ent)
 	int			damage = 8;
 	int			kick = 2;
 	vec3_t		offset;
+
+	if (ent->client->uber_damage == true)
+	{
+		damage = damage * 2;
+	}
 
 	if (!(ent->client->buttons & BUTTON_ATTACK))
 	{
@@ -1020,7 +1056,11 @@ void Machinegun_Fire (edict_t *ent)
 
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
-	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
+	if (ent->client->Inf_ammo == true && ent->client->inf_ammo_timer >= level.time)
+	{
+		ent->client->pers.inventory[ent->client->ammo_index];
+	}
+	else if (!((int)dmflags->value & DF_INFINITE_AMMO))
 		ent->client->pers.inventory[ent->client->ammo_index]--;
 
 	ent->client->anim_priority = ANIM_ATTACK;
@@ -1183,6 +1223,38 @@ SHOTGUN / SUPERSHOTGUN
 
 void weapon_shotgun_fire (edict_t *ent)
 {
+	/*int	i;
+	vec3_t		start;
+	vec3_t		forward, right;
+	vec3_t		angles;
+	int			damage = 8;
+	int			kick = 2;
+	vec3_t		offset;
+
+	if (!(ent->client->buttons & BUTTON_ATTACK))
+	{
+		ent->client->machinegun_shots = 0;
+		ent->client->ps.gunframe++;
+		return;
+	}
+
+	if (ent->client->ps.gunframe == 5)
+		ent->client->ps.gunframe = 4;
+	else
+		ent->client->ps.gunframe = 5;
+
+	if (ent->client->pers.inventory[ent->client->ammo_index] < 1)
+	{
+		ent->client->ps.gunframe = 6;
+		if (level.time >= ent->pain_debounce_time)
+		{
+			gi.sound(ent, CHAN_VOICE, gi.soundindex("weapons/noammo.wav"), 1, ATTN_NORM, 0);
+			ent->pain_debounce_time = level.time + 1;
+		}
+		NoAmmoWeaponChange(ent);
+		return;
+	}*/
+
 	vec3_t		start;
 	vec3_t		forward, right;
 	vec3_t		offset;
@@ -1209,10 +1281,14 @@ void weapon_shotgun_fire (edict_t *ent)
 		kick *= 4;
 	}
 
+	if (ent->client->uber_damage == true)
+	{
+		damage = damage * 2;
+	}
 	if (deathmatch->value)
-		fire_shotgun (ent, start, forward, damage, kick, 500, 500, DEFAULT_DEATHMATCH_SHOTGUN_COUNT, MOD_SHOTGUN);
+		fire_shotgun (ent, start, forward, damage, kick, 300, 500, DEFAULT_DEATHMATCH_SHOTGUN_COUNT, MOD_MACHINEGUN);
 	else
-		fire_shotgun (ent, start, forward, damage, kick, 500, 500, DEFAULT_SHOTGUN_COUNT, MOD_SHOTGUN);
+		fire_shotgun (ent, start, forward, damage, kick, 300, 500, DEFAULT_SHOTGUN_COUNT, MOD_MACHINEGUN);
 
 	// send muzzle flash
 	gi.WriteByte (svc_muzzleflash);
@@ -1223,7 +1299,11 @@ void weapon_shotgun_fire (edict_t *ent)
 	ent->client->ps.gunframe++;
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
-	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
+	if (ent->client->Inf_ammo == true && ent->client->inf_ammo_timer >= level.time)
+	{
+		ent->client->pers.inventory[ent->client->ammo_index];
+	}
+	else if (!((int)dmflags->value & DF_INFINITE_AMMO))
 		ent->client->pers.inventory[ent->client->ammo_index]--;
 }
 
@@ -1231,8 +1311,11 @@ void Weapon_Shotgun (edict_t *ent)
 {
 	static int	pause_frames[]	= {22, 28, 34, 0};
 	static int	fire_frames[]	= {8, 9, 0};
+	/*static int	pause_frames[] = { 23, 45, 0 };*/
+	/*static int	fire_frames[] = { 4, 5, 0 };*/
 
-	Weapon_Generic (ent, 7, 18, 36, 39, pause_frames, fire_frames, weapon_shotgun_fire);
+	Weapon_Generic (ent, 7, 18, 36, 39, pause_frames, fire_frames, Machinegun_Fire);
+	//weapon_shotgun_fire
 }
 
 
@@ -1244,6 +1327,12 @@ void weapon_supershotgun_fire (edict_t *ent)
 	vec3_t		v;
 	int			damage = 6;
 	int			kick = 12;
+
+
+	if (ent->client->uber_damage == true)
+	{
+		damage = damage * 2;
+	}
 
 	AngleVectors (ent->client->v_angle, forward, right, NULL);
 
@@ -1277,8 +1366,12 @@ void weapon_supershotgun_fire (edict_t *ent)
 	ent->client->ps.gunframe++;
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
-	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
-		ent->client->pers.inventory[ent->client->ammo_index] -= 2;
+	if (ent->client->Inf_ammo == true && ent->client->inf_ammo_timer >= level.time)
+	{
+		ent->client->pers.inventory[ent->client->ammo_index];
+	}
+	else if (!((int)dmflags->value & DF_INFINITE_AMMO))
+		ent->client->pers.inventory[ent->client->ammo_index]-=2;
 }
 
 void Weapon_SuperShotgun (edict_t *ent)
@@ -1318,6 +1411,12 @@ void weapon_railgun_fire (edict_t *ent)
 		kick = 250;
 	}
 
+
+	if (ent->client->uber_damage == true)
+	{
+		damage = damage * 2;
+	}
+
 	if (is_quad)
 	{
 		damage *= 4;
@@ -1342,7 +1441,11 @@ void weapon_railgun_fire (edict_t *ent)
 	ent->client->ps.gunframe++;
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
-	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
+	if (ent->client->Inf_ammo == true && ent->client->inf_ammo_timer >= level.time)
+	{
+		ent->client->pers.inventory[ent->client->ammo_index];
+	}
+	else if (!((int)dmflags->value & DF_INFINITE_AMMO))
 		ent->client->pers.inventory[ent->client->ammo_index]--;
 }
 
@@ -1375,6 +1478,12 @@ void weapon_bfg_fire (edict_t *ent)
 		damage = 200;
 	else
 		damage = 500;
+
+
+	if (ent->client->uber_damage == true)
+	{
+		damage = damage * 2;
+	}
 
 	if (ent->client->ps.gunframe == 9)
 	{
@@ -1418,8 +1527,12 @@ void weapon_bfg_fire (edict_t *ent)
 
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
-	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
-		ent->client->pers.inventory[ent->client->ammo_index] -= 50;
+	if (ent->client->Inf_ammo == true && ent->client->inf_ammo_timer >= level.time)
+	{
+		ent->client->pers.inventory[ent->client->ammo_index];
+	}
+	else if (!((int)dmflags->value & DF_INFINITE_AMMO))
+		ent->client->pers.inventory[ent->client->ammo_index]-=50;
 }
 
 void Weapon_BFG (edict_t *ent)

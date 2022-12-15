@@ -68,6 +68,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define FL_NO_KNOCKBACK			0x00000800
 #define FL_POWER_ARMOR			0x00001000	// power armor (if any) is active
 #define FL_RESPAWN				0x80000000	// used for item respawning
+#define FL_HELPMENU				0x00010000
 
 
 #define	FRAMETIME		0.1
@@ -105,6 +106,11 @@ typedef enum
 	AMMO_CELLS,
 	AMMO_SLUGS
 } ammo_t;
+
+typedef enum
+{
+	MAX_WEAPONS
+};
 
 
 //deadflag
@@ -220,9 +226,9 @@ typedef struct
 
 // gitem_t->weapmodel for weapons indicates model index
 #define WEAP_BLASTER			1 
-#define WEAP_SHOTGUN			2 
+#define WEAP_SHOTGUN			2
 #define WEAP_SUPERSHOTGUN		3 
-#define WEAP_MACHINEGUN			4 
+#define WEAP_MACHINEGUN			4
 #define WEAP_CHAINGUN			5 
 #define WEAP_GRENADES			6 
 #define WEAP_GRENADELAUNCHER	7 
@@ -620,6 +626,7 @@ int ArmorIndex (edict_t *ent);
 int PowerArmorType (edict_t *ent);
 gitem_t	*GetItemByIndex (int index);
 qboolean Add_Ammo (edict_t *ent, gitem_t *item, int count);
+qboolean Add_Weapon(edict_t *ent, gitem_t* item, int count);
 void Touch_Item (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf);
 
 //
@@ -781,6 +788,7 @@ void G_SetSpectatorStats (edict_t *ent);
 void G_CheckChaseStats (edict_t *ent);
 void ValidateSelectedItem (edict_t *ent);
 void DeathmatchScoreboardMessage (edict_t *client, edict_t *killer);
+void HelpText(edict_t* ent);
 
 //
 // g_pweapon.c
@@ -852,6 +860,9 @@ typedef struct
 	int			max_cells;
 	int			max_slugs;
 
+	//weapon capcities
+	int			max_weapon;
+
 	gitem_t		*weapon;
 	gitem_t		*lastweapon;
 
@@ -894,6 +905,7 @@ struct gclient_s
 	qboolean	showhelpicon;
 
 	int			ammo_index;
+	int			weapon_index;
 
 	int			buttons;
 	int			oldbuttons;
@@ -959,6 +971,19 @@ struct gclient_s
 
 	edict_t		*chase_target;		// player we are chasing
 	qboolean	update_chase;		// need to update chase info?
+
+	// my mod perks
+	qboolean	Inf_ammo;
+	float		inf_ammo_timer;
+	qboolean	invulnerable;
+	float		invulnerable_timer;
+	qboolean	uber_health;
+	float		health_timer;
+	qboolean	health_up;
+	float		health_up_timer;
+	qboolean	uber_damage;
+	/*float		uber_damage;*/
+
 };
 
 
