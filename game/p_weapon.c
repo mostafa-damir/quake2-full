@@ -870,11 +870,16 @@ void Weapon_Blaster_Fire (edict_t *ent)
 	int		damage;
 
 	if (deathmatch->value)
-		damage = 0;
+		damage = 5;
 	else
-		damage = 0;
+		damage = 5;
 	Blaster_Fire (ent, vec3_origin, damage, false, EF_BLASTER);
 	ent->client->ps.gunframe++;
+
+	if (ent->client->uber_damage == true)
+	{
+		damage = damage * 2;
+	}
 }
 
 void Weapon_Blaster (edict_t *ent)
